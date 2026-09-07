@@ -1,9 +1,17 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const AppContext = createContext(null);
 
+const getRoleFromPath = (path) => {
+  if (path.startsWith('/ministry')) return 'ministry';
+  if (path.startsWith('/public')) return 'public';
+  return 'mospi';
+};
+
 export const AppProvider = ({ children }) => {
-  const [currentRole, setCurrentRole] = useState('mospi');
+  const location = useLocation();
+  const [currentRole, setCurrentRole] = useState(() => getRoleFromPath(window.location.pathname));
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -32,6 +40,11 @@ export const AppProvider = ({ children }) => {
     }
     return () => { document.body.style.overflow = ''; };
   }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    const roleFromPath = getRoleFromPath(location.pathname);
+    setCurrentRole((prev) => (prev === roleFromPath ? prev : roleFromPath));
+  }, [location.pathname]);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);

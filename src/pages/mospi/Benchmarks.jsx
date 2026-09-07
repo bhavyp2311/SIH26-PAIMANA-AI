@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import PageHeader from '../../components/common/PageHeader';
-import { projects } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 
 const Benchmarks = () => {
+  const { projects } = useProjects();
   const [selectedProject, setSelectedProject] = useState(projects[0]?.id || '');
 
   const project = projects.find(p => p.id === selectedProject);

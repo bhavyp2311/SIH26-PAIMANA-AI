@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader';
-import { projects } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 import { formatCurrency } from '../../utils/helpers';
 
 const PublicProjects = () => {
   const navigate = useNavigate();
+  const { projects } = useProjects();
 
   return (
     <div>

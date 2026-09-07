@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import PageHeader from '../../components/common/PageHeader';
 import ChartCard from '../../components/common/ChartCard';
-import { projects, getSectors, getMinistries } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 import { sectorWiseProgress, riskDistributionData } from '../../data/analyticsData';
 
 const Analytics = () => {
+  const { projects, getSectors, getMinistries } = useProjects();
   const [sectorFilter, setSectorFilter] = useState('all');
   const [ministryFilter, setMinistryFilter] = useState('all');
   const [riskFilter, setRiskFilter] = useState('all');

@@ -1,10 +1,11 @@
 import { useParams, Link } from 'react-router-dom';
-import { getProjectById } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 import { formatCurrency, formatDate, calculateMonthsDelayed } from '../../utils/helpers';
 import { ArrowLeft } from 'lucide-react';
 
 const PublicProjectDetail = () => {
   const { projectId } = useParams();
+  const { getProjectById } = useProjects();
   const project = getProjectById(projectId);
 
   if (!project) {

@@ -1,16 +1,61 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import RiskBadge from '../../components/common/RiskBadge';
 import RiskGauge from '../../components/common/RiskGauge';
 import RiskCard from '../../components/common/RiskCard';
 import RiskDriver from '../../components/common/RiskDriver';
 import Timeline from '../../components/common/Timeline';
-import { getProjectById } from '../../data/projects';
+import ProjectAssistantFloating from '../../components/common/ProjectAssistantFloating';
+import { useProjects } from '../../context/ProjectsContext';
 import { formatCurrency, getRiskColor } from '../../utils/helpers';
-import { ArrowLeft, AlertTriangle, CheckCircle, Bot } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, CheckCircle, Bot, Pencil, X, Save, RotateCcw } from 'lucide-react';
 
 const ProjectHealth = () => {
   const { projectId } = useParams();
+  const { getProjectById, updateProject, resetProjects } = useProjects();
   const project = getProjectById(projectId);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState(null);
+  const [saved, setSaved] = useState(false);
+
+  const startEdit = () => {
+    setForm({
+      physicalProgress: project.physicalProgress,
+      expenditure: project.expenditure,
+      revisedCost: project.revisedCost,
+      originalCost: project.originalCost,
+      status: project.status,
+      originalCompletionDate: project.originalCompletionDate,
+      revisedCompletionDate: project.revisedCompletionDate
+    });
+    setEditing(true);
+  };
+
+  const handleChange = (key, value) => {
+    setForm(prev => ({ ...prev, [key]: value }));
+  };
+
+  const clamp = (value) => Math.min(100, Math.max(0, Number(value)));
+
+  const handleSave = () => {
+    updateProject(projectId, {
+      ...form,
+      physicalProgress: clamp(form.physicalProgress),
+      expenditure: Number(form.expenditure),
+      revisedCost: Number(form.revisedCost),
+      originalCost: Number(form.originalCost)
+    });
+    setEditing(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleReset = () => {
+    if (window.confirm('Reset all project data back to the original demo dataset?')) {
+      resetProjects();
+      setEditing(false);
+    }
+  };
 
   if (!project) {
     return (
@@ -36,10 +81,19 @@ const ProjectHealth = () => {
 
   return (
     <div>
-      <Link to="/ministry/projects" className="inline-flex items-center gap-2 text-sm text-muted hover:text-navy mb-4 sm:mb-6 transition-colors">
-        <ArrowLeft className="w-4 h-4" />
-        Back to Projects
-      </Link>
+      <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+        <Link to="/ministry/projects" className="inline-flex items-center gap-2 text-sm text-muted hover:text-navy transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Projects
+        </Link>
+        <button
+          onClick={startEdit}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors text-sm font-medium"
+        >
+          <Pencil className="w-4 h-4" />
+          Update Progress
+        </button>
+      </div>
 
       {/* Project Header */}
       <div className="bg-white border border-border rounded-xl p-4 sm:p-6 mb-5 sm:mb-6">
@@ -217,6 +271,146 @@ const ProjectHealth = () => {
           Open Project Assistant
         </Link>
       </div>
+
+      {/* Saved toast */}
+      {saved && (
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-200 text-risk-low rounded-xl shadow-lg text-sm font-medium">
+          <CheckCircle className="w-5 h-5" />
+          Project updated successfully
+        </div>
+      )}
+
+      <ProjectAssistantFloating project={project} />
+
+      {/* Edit Modal */}
+      {editing && form && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/40">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <div>
+                <h3 className="text-base font-semibold text-text">Update Project Progress</h3>
+                <p className="text-xs text-muted mt-0.5">{project.name}</p>
+              </div>
+              <button
+                onClick={() => setEditing(false)}
+                className="p-2 hover:bg-bg rounded-lg transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5 text-muted" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div>
+                <label className="text-xs font-medium text-muted uppercase tracking-wide mb-2 flex items-center justify-between">
+                  <span>Physical Progress</span>
+                  <span className="text-sm font-semibold text-text">{form.physicalProgress}%</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={form.physicalProgress}
+                  onChange={(e) => handleChange('physicalProgress', e.target.value)}
+                  className="w-full accent-navy"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted uppercase tracking-wide mb-2">Expenditure (₹ Cr)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.expenditure}
+                    onChange={(e) => handleChange('expenditure', e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-navy"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted uppercase tracking-wide mb-2">Revised Cost (₹ Cr)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.revisedCost}
+                    onChange={(e) => handleChange('revisedCost', e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-navy"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted uppercase tracking-wide mb-2">Original Cost (₹ Cr)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.originalCost}
+                    onChange={(e) => handleChange('originalCost', e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-navy"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted uppercase tracking-wide mb-2">Status</label>
+                  <select
+                    value={form.status}
+                    onChange={(e) => handleChange('status', e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-navy"
+                  >
+                    <option>On Track</option>
+                    <option>Delayed</option>
+                    <option>Critical</option>
+                    <option>Completed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted uppercase tracking-wide mb-2">Original Completion</label>
+                  <input
+                    type="date"
+                    value={form.originalCompletionDate}
+                    onChange={(e) => handleChange('originalCompletionDate', e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-navy"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted uppercase tracking-wide mb-2">Revised Completion</label>
+                  <input
+                    type="date"
+                    value={form.revisedCompletionDate}
+                    onChange={(e) => handleChange('revisedCompletionDate', e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-navy"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-border">
+              <button
+                onClick={handleReset}
+                className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-risk-high transition-colors"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Reset Demo Data
+              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setEditing(false)}
+                  className="px-4 py-2.5 text-sm font-medium text-muted hover:bg-bg rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-navy text-white rounded-lg hover:bg-navy-dark transition-colors text-sm font-medium"
+                >
+                  <Save className="w-4 h-4" />
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

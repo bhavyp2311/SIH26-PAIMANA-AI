@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import PageHeader from '../../components/common/PageHeader';
 import ProjectTable from '../../components/common/ProjectTable';
-import { projects, getSectors } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 
 const Projects = () => {
+  const { projects, getSectors } = useProjects();
   const [sectorFilter, setSectorFilter] = useState('all');
   const [riskFilter, setRiskFilter] = useState('all');
 

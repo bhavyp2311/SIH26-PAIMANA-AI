@@ -4,7 +4,7 @@ import RiskGauge from '../../components/common/RiskGauge';
 import RiskCard from '../../components/common/RiskCard';
 import RiskDriver from '../../components/common/RiskDriver';
 import Timeline from '../../components/common/Timeline';
-import { getProjectById } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 import { ArrowLeft, AlertTriangle, CheckCircle, Clock, FileText, Bot } from 'lucide-react';
 
@@ -20,6 +20,7 @@ const getRiskColor = (level) => {
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
+  const { getProjectById } = useProjects();
   const project = getProjectById(projectId);
 
   if (!project) {

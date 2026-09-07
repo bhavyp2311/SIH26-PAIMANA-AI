@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader';
 import RiskBadge from '../../components/common/RiskBadge';
-import { projects, getMinistries } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 import { formatCurrency } from '../../utils/helpers';
 
 const MinistryProjects = () => {
   const navigate = useNavigate();
+  const { projects, getMinistries } = useProjects();
   const [ministryFilter, setMinistryFilter] = useState('Ministry of Railways');
 
   const ministries = getMinistries();

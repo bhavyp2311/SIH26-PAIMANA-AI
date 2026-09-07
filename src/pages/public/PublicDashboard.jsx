@@ -2,12 +2,13 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import PageHeader from '../../components/common/PageHeader';
 import KpiCard from '../../components/common/KpiCard';
 import ChartCard from '../../components/common/ChartCard';
-import { projects } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 import { portfolioMetrics, scheduleStatusData, sectorWiseProgress } from '../../data/analyticsData';
 import { FolderKanban, IndianRupee, Activity, TrendingUp } from 'lucide-react';
 import { formatCurrency } from '../../utils/helpers';
 
 const PublicDashboard = () => {
+  const { projects } = useProjects();
   return (
     <div>
       <PageHeader

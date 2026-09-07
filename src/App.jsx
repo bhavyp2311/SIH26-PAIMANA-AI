@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
+import { ProjectsProvider } from './context/ProjectsContext';
 import AppShell from './layouts/AppShell';
 
 // Landing
@@ -52,9 +53,10 @@ const NotFound = () => (
 
 function App() {
   return (
-    <AppProvider>
-      <BrowserRouter>
-        <Routes>
+    <BrowserRouter>
+      <AppProvider>
+        <ProjectsProvider>
+          <Routes>
           {/* Landing */}
           <Route path="/" element={<Landing />} />
 
@@ -87,8 +89,9 @@ function App() {
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </AppProvider>
+        </ProjectsProvider>
+      </AppProvider>
+    </BrowserRouter>
   );
 }
 

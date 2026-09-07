@@ -1,10 +1,11 @@
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import PageHeader from '../../components/common/PageHeader';
 import ChartCard from '../../components/common/ChartCard';
-import { projects } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 import { scheduleStatusData, sectorWiseProgress, riskDistributionData } from '../../data/analyticsData';
 
 const PublicAnalytics = () => {
+  const { projects } = useProjects();
   const sectorData = [
     { sector: 'Railways', projects: projects.filter(p => p.sector === 'Railways').length },
     { sector: 'Roads', projects: projects.filter(p => p.sector === 'Roads').length },

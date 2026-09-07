@@ -4,7 +4,7 @@ import PageHeader from '../../components/common/PageHeader';
 import KpiCard from '../../components/common/KpiCard';
 import ChartCard from '../../components/common/ChartCard';
 import RiskBadge from '../../components/common/RiskBadge';
-import { projects } from '../../data/projects';
+import { useProjects } from '../../context/ProjectsContext';
 import { riskDistribution, sectorRiskData, riskTrendData } from '../../data/riskData';
 import { getAllWarnings } from '../../data/warnings';
 import {
@@ -21,6 +21,7 @@ import {
 
 const Overview = () => {
   const navigate = useNavigate();
+  const { projects } = useProjects();
   const highRiskProjects = projects.filter(p => p.riskLevel === 'high' || p.riskLevel === 'critical');
   const costRiskProjects = projects.filter(p => p.costRisk > 30);
   const delayRiskProjects = projects.filter(p => p.timeRisk > 30);
